@@ -29,6 +29,8 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/reposit
         cmake \
         cppcheck \
         gcompat \
+        git \
+        g++ \
         mold \
         ninja \
         python3 \
