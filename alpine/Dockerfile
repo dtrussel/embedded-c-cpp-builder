@@ -24,14 +24,16 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/reposit
     apk update && \
     apk upgrade && \
     apk --update add \
-        clang \
+        clang15 \
         clang-extra-tools \
         cmake \
+        compiler-rt \
         cppcheck \
         gcompat \
         git \
         g++ \
-        mold \
+        llvm15 \
+        mold \  
         ninja \
         python3 \
         py3-pip \
