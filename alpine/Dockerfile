@@ -11,10 +11,10 @@ RUN apk update && \
 
 FROM base AS cross-compiler-provider
 RUN GCCARM_LINK="https://developer.arm.com/-/media/Files/downloads/gnu-rm/10.3-2021.10/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2" && \
-    wget -O /tmp/gcc-arm-none-eabi.tar.bz2 ${GCCARM_LINK} && \
+    wget --progress=dot:giga -O /tmp/gcc-arm-none-eabi.tar.bz2 ${GCCARM_LINK} && \
     echo "2383e4eb4ea23f248d33adc70dc3227e /tmp/gcc-arm-none-eabi.tar.bz2" > /tmp/check.md5 && \
     md5sum --status --check /tmp/check.md5 && \
-    tar xvf /tmp/gcc-arm-none-eabi.tar.bz2 --strip-components=1 -C /usr && \
+    tar xf /tmp/gcc-arm-none-eabi.tar.bz2 --strip-components=1 -C /usr && \
     rm -rf /tmp/gcc-arm-none-eabi.tar.bz2 && \
     rm -rf /tmp/check.md5 && \
     rm -rf /usr/share/doc
@@ -38,6 +38,7 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/reposit
         && \
     rm -rf /var/cache/apk/*
 
+ENV PIP_ROOT_USER_ACTION=ignore
 RUN pip3 install --no-cache-dir --upgrade pip && \
   pip3 install --no-cache-dir \
   conan \
