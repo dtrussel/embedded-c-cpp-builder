@@ -29,6 +29,7 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/reposit
         cmake \
         compiler-rt \
         cppcheck \
+        doxygen \
         gcompat \
         git \
         g++ \
@@ -45,5 +46,17 @@ RUN pip3 install --no-cache-dir --upgrade pip && \
   pip3 install --no-cache-dir \
   conan \
   cpplint
+
+# Create a non-root user for development
+ARG USERNAME=developer
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+RUN addgroup --gid $USER_GID $USERNAME \
+    && adduser -u $USER_UID -G $USERNAME -D -H $USERNAME \
+    && apk --no-cache add sudo \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
+
+USER $USERNAME
 
 COPY --from=cross-compiler-provider /usr /usr
