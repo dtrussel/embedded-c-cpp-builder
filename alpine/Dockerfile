@@ -11,10 +11,10 @@ RUN apk update && \
 
 FROM base AS cross-compiler-provider
 RUN GCCARM_LINK="https://developer.arm.com/-/media/Files/downloads/gnu-rm/10.3-2021.10/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2" && \
-    wget -O /tmp/gcc-arm-none-eabi.tar.bz2 ${GCCARM_LINK} && \
+    wget --progress=dot:giga -O /tmp/gcc-arm-none-eabi.tar.bz2 ${GCCARM_LINK} && \
     echo "2383e4eb4ea23f248d33adc70dc3227e /tmp/gcc-arm-none-eabi.tar.bz2" > /tmp/check.md5 && \
     md5sum --status --check /tmp/check.md5 && \
-    tar xvf /tmp/gcc-arm-none-eabi.tar.bz2 --strip-components=1 -C /usr && \
+    tar xf /tmp/gcc-arm-none-eabi.tar.bz2 --strip-components=1 -C /usr && \
     rm -rf /tmp/gcc-arm-none-eabi.tar.bz2 && \
     rm -rf /tmp/check.md5 && \
     rm -rf /usr/share/doc
@@ -24,23 +24,37 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/reposit
     apk update && \
     apk upgrade && \
     apk --update add \
-        clang \
+        clang15 \
         clang-extra-tools \
         cmake \
+        compiler-rt \
         cppcheck \
+        doxygen \
         gcompat \
         git \
         g++ \
-        mold \
+        llvm15 \
+        mold \  
         ninja \
         python3 \
         py3-pip \
         && \
     rm -rf /var/cache/apk/*
 
+ENV PIP_ROOT_USER_ACTION=ignore
 RUN pip3 install --no-cache-dir --upgrade pip && \
   pip3 install --no-cache-dir \
   conan \
   cpplint
+
+# Create a non-root user for development
+ARG USERNAME=developer
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+RUN addgroup --gid $USER_GID $USERNAME \
+    && adduser -u $USER_UID -G $USERNAME -D $USERNAME \
+    && apk --no-cache add sudo \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
 
 COPY --from=cross-compiler-provider /usr /usr
