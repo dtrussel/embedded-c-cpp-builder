@@ -1,0 +1,4 @@
+conan
+breathe>=4.34
+sphinx~=5.0,!=5.2.0.post0
+sphinx_rtd_theme~=1.0
