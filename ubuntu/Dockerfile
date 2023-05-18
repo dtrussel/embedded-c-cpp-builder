@@ -2,6 +2,7 @@
 FROM ubuntu:latest AS base
 RUN apt-get update && apt-get install -y \
   bzip2 \
+  xz-utils \
   clang \
   git \
   tar \
@@ -9,9 +10,10 @@ RUN apt-get update && apt-get install -y \
   && rm -rf /var/lib/apt/lists/*
 
 FROM base AS cross-compiler-provider
-RUN GCCARM_LINK="https://developer.arm.com/-/media/Files/downloads/gnu-rm/10.3-2021.10/gcc-arm-none-eabi-10.3-2021.10-x86_64-linux.tar.bz2" && \
+ARG GCCARM_MD5="606dc4ab63874b97725296fe0f94fb91"
+RUN GCCARM_LINK="https://developer.arm.com/-/media/Files/downloads/gnu/12.2.rel1/binrel/arm-gnu-toolchain-12.2.rel1-x86_64-arm-none-linux-gnueabihf.tar.xz?rev=9929cb6c0e8948f0ba1a621167fcd56d&hash=8F13B510F8B20149258CB4AA5372BF92" && \
     wget -O /tmp/gcc-arm-none-eabi.tar.bz2 ${GCCARM_LINK} && \
-    echo "2383e4eb4ea23f248d33adc70dc3227e /tmp/gcc-arm-none-eabi.tar.bz2" > /tmp/check.md5 && \
+    echo "${GCCARM_MD5} /tmp/gcc-arm-none-eabi.tar.bz2" > /tmp/check.md5 && \
     md5sum --status --check /tmp/check.md5 && \
     tar xvf /tmp/gcc-arm-none-eabi.tar.bz2 --strip-components=1 -C /usr && \
     rm -rf /tmp/gcc-arm-none-eabi.tar.bz2 && \
