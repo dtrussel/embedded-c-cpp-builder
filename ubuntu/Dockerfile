@@ -58,5 +58,20 @@ RUN --mount=type=bind,source=resources,target=/tmp/resources \
   pip3 install --no-cache-dir --upgrade pip && \
   pip3 install --no-cache-dir -r /tmp/resources/requirements.txt
 
+FROM embedded-builder AS embedded-developer
+# Create a non-root user for development
+ARG USERNAME=developer
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
 
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    #
+    # [Optional] Add sudo support.
+    && apt-get update \
+    && apt-get install -y sudo \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
+
+USER $USERNAME
         
