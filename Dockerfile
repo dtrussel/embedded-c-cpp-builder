@@ -50,11 +50,17 @@ COPY --from=mold-provider /usr/ /usr/
 COPY --from=doxygen-provider /usr/bin /usr/bin
 COPY --from=llvm-provider /usr/ /usr/
 
+ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
   cmake \
   cppcheck \
   graphviz \
+  latexmk \
   ninja-build \
+  texlive-latex-recommended \
+  texlive-fonts-recommended \
+  tex-gyre \
+  texlive-latex-extra \
   python3 \
   python3-pip \
   && rm -rf /var/lib/apt/lists/*
@@ -66,7 +72,7 @@ RUN --mount=type=bind,source=resources,target=/tmp/resources \
 FROM embedded-builder AS embedded-developer
 # Create a non-root user for development
 ARG USERNAME=developer
-ARG USER_UID=1000
+ARG USER_UID=1001
 ARG USER_GID=$USER_UID
 
 RUN groupadd --gid $USER_GID $USERNAME \
